@@ -10,41 +10,39 @@ Input: [3,1,5,8]
 Output: 167 
 */
 
+#include <bits/stdc++.h>
+using namespace std;
 int maxCoins(vector<int>& nums) {
-    /* O(n^3) Time and O(n^2) Space */
-    int size = nums.size();
-    if(size == 0)
-        return 0;
-        
-    int i, j, k;
-    vector< vector<int> > dp(size, vector<int>(size, 0));
-       
-    for(int len = 1; len <= size; len++){
-        for(i = 0; i <= size - len; i++){
-            j = len + i - 1;
-            for(k = i; k <= j; k++){ 
-                /* Left/Right Value has default 1 but holds prev and after ballon value if k is in middle */
-                int leftValue  = 1;
-                int rightValue = 1;
-                    
-                if(i != 0)
-                    leftValue  = nums[i-1];
-                if(j != size-1)
-                    rightValue = nums[j+1];
-                        
-                /* Before and After - current k balloon is last to burst select the left side and right side to burst */
-                int before = 0;
-                int after  = 0;
-                    
-                if(i != k)
-                    before = dp[i][k-1];
-                if(j != k)
-                    after  = dp[k+1][j];
-                    
-                dp[i][j] = max(dp[i][j], 
-                         leftValue * nums[k] * rightValue + before + after);
-            }   
+    int n = nums.size();
+    nums.push_back(1);
+    nums.insert(nums.begin(), 1);
+    vector<vector<int>>dp(n+2, vector<int>(n+2,0));;
+    for(int i = n; i>=1; i--){
+        for(int j =1; j<=n; j++){
+            if(i>j) continue;
+            int ans = 0;
+            int maxi = INT_MIN;
+            for(int ind = i; ind<=j; ind++){
+                ans = nums[i-1]*nums[ind]*nums[j+1] + dp[i][ind-1] + dp[ind+1][j];
+                maxi = max(maxi, ans);
+            }
+            dp[i][j] = maxi;
         }
-    }    
-    return dp[0][size-1];
+    }
+    return dp[1][n];
 }
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    vector<int> A(n);
+    for (int i = 0; i < n; i++) {
+        cin >> A[i];
+    }
+
+    cout << maxCoins(A) << "\n";
+    return 0;
+}
+

@@ -14,67 +14,52 @@ Input
 Output
 20
 */
- 
-#include <iostream>
-using namespace std;
- 
-int maxcoins(int A[],int siz)
-{
-    int nums[siz+2];
-    int n=1;
- 
-    for(int i=0;i<siz;i++)
-    {
-        if(A[i]>0)
-        {
-            nums[n] = A[i];
-            n++;
-        }
-    }
-    nums[0] = nums[n] = 1;
-    n++;
- 
-    int dp[n][n] = {};
- 
-    for(int j=2;j<n;j++)
-    {
-        for(int left=0;left<n-j;left++)
-        {
-            int right = left+j;
-            for(int i = left+1;i<right;i++)
-            {
-                if(left==0 && right==n-1)
-                    dp[left][right] = max(nums[left]*nums[i]*nums[right] + dp[left][i] + dp[i][right],dp[left][right]);
-                else
-                    dp[left][right] = max(nums[left]*nums[right] + dp[left][i] + dp[i][right],dp[left][right]);
-            }
-        }
-        for(int i=0;i<n;i++)
-        {
-            for(int j=0;j<n;j++)
-            {
-                cout<<dp[i][j]<<" ";
-            }
-            cout<<endl;
-        }
-    }
-    return dp[0][n-1];
-}
- 
-int main()
-{
-    int siz;
-    cin >> siz;
-    int A[siz];
-    for(int i=0;i<siz;i++)
-        cin >> A[i];
- 
-    int ans = maxcoins(A,siz);
-    cout << ans << endl;
-    return 0;
-}
 
 /*
 5
 1 2 3 5 4
 */
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int maxCoins(vector<int>& nums) {
+    int n = nums.size();
+    nums.push_back(1);
+    nums.insert(nums.begin(), 1);
+    vector<vector<int>> dp(n+2, vector<int>(n+2,0));
+    for(int i = n; i >= 1; i--) {
+        for(int j = 1; j <= n; j++) {
+            if (i > j) continue;
+            int maxi = INT_MIN;
+            for(int ind = i; ind <= j; ind++) {
+                int gain;
+                if (i==1 && j==n) {
+                    gain = nums[ind];
+                } else {
+                    gain = nums[i-1] * nums[j+1];
+                }
+                
+                int cand = gain 
+                         + dp[i][ind-1] 
+                         + dp[ind+1][j];
+                maxi = max(maxi, cand);
+            }
+            dp[i][j] = maxi;
+        }
+    }
+    return dp[1][n];
+}
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    vector<int> A(n);
+    for (int i = 0; i < n; i++)
+        cin >> A[i];
+
+    cout << maxCoins(A) << "\n";
+    return 0;
+}

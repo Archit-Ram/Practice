@@ -42,108 +42,54 @@ Example of Output
 18
 CUSTOM - 31 <- 4
 */
-#include<iostream>
-#include<climits>
+#include <bits/stdc++.h>
 using namespace std;
+using ll = long long;
+const ll INF = (1LL<<60);
 
-int N, result;
+int N;
+ll best;
 
-void minCostMrLee(int **arr, bool *visited, int count, int cost, int src){
-    // Base Case
-    if(count == N-1){
-    	/* Corner Case if no path exists from last city */
-        if(arr[src][0] != 0)
-        	result = min(result, cost + arr[src][0]);
+void dfs(const vector<vector<ll>>& a, vector<char>& used, int visitedCount, int last, ll cost) {
+    if (visitedCount == N) {
+        if (a[last][0] != 0) best = min(best, cost + a[last][0]);
         return;
     }
-    
-    // Main Case
-    for(int i=0; i<N; i++){
-        if(!visited[i] && arr[src][i] != 0){
-            visited[i] = true;
-            minCostMrLee(arr, visited, count + 1, cost + arr[src][i], i);
-            visited[i] = false;
-        }
+
+    for (int v = 1; v < N; ++v) { 
+        if (used[v]) continue;
+        if (a[last][v] == 0) continue;
+        used[v] = 1;
+        dfs(a, used, visitedCount + 1, v, cost + a[last][v]);
+        used[v] = 0;
     }
 }
 
-int main(){
-	int t;
-	cin >> t;
-	while(t--){
-		cin >> N;
-		int **arr = new int*[N];
-		for(int i=0; i<N; i++){
-			arr[i] = new int[N];
-		}
-        bool *visited = new bool[N];
-		
-        for(int i=0; i<N; i++){
-            visited[i] = false;
-			for(int j=0; j<N; j++){
-				cin >> arr[i][j];
-			}
-		}
-		
-        result = INT_MAX;    
-        
-        visited[0] = true;
-        
-        minCostMrLee(arr, visited, 0, 0, 0);
-        result != INT_MAX ? cout << result << "\n" : cout << "-1\n";
-	}
-	return 0;
-}
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-/*
-#include<iostream>
-using namespace std;
-int arr[1000][1000];
-bool visited[1000];
-int ans = 1000000;
-void dfs(int n,int count,int cost,int last)
-{
-    //cout<<last<<" ";
-    if(count==n)
-    {
-        //cout<<endl;
-        int cost1 = cost + arr[last][0];
-        if(cost1<ans)
-            ans = cost1;
-    }
-    for(int i=1;i<n;i++)
-    {
-        if(visited[i])
+    int T;
+    if (!(cin >> T)) return 0;
+    while (T--) {
+        cin >> N;
+        vector<vector<ll>> a(N, vector<ll>(N));
+        for (int i = 0; i < N; ++i)
+            for (int j = 0; j < N; ++j)
+                cin >> a[i][j];
+
+        if (N == 1) {
+            cout << 0 << '\n';
             continue;
-        if(arr[last][i]==0)
-            continue;
-        visited[i]=true;
-        int cost1 = cost + arr[last][i];
-        dfs(n,count+1,cost1,i);
-        visited[i]=false;
-    }
-    return;
-}
-int main()
-{
-    int t;
-    cin>>t;
-    while(t--)
-    {
-        int n;
-        ans = 1000000;
-        cin>>n;
-        for(int i=0;i<n;i++)
-            visited[i]=false;
-        for(int i=0;i<n;i++)
-        {
-            for(int j=0;j<n;j++)
-           {
-               cin>>arr[i][j];
-           }
         }
-        dfs(n,1,0,0);
-        cout<<ans<<endl;
+
+        best = INF;
+        vector<char> used(N, 0);
+        used[0] = 1;
+        dfs(a, used, 1, 0, 0);
+
+        if (best == INF) cout << -1 << '\n';
+        else cout << best << '\n';
     }
+    return 0;
 }
-*/

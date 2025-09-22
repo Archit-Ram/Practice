@@ -55,54 +55,58 @@ Output (10 lines in total)
 
 #3 366
 */
-#include<iostream>
-#include<climits>
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
 using namespace std;
-int x[20],y[20],n,ans;
 
-int abs(int i){//Absolute function
-	if(i>0){
-		return i;
-	}
-	return -i;
+using ll = long long;
+const ll INF = (1LL << 60);
+
+int n;
+ll best;
+vector<pair<int, int>> pts;
+
+inline int manhattan(int i, int j) {
+    return abs(pts[i].first - pts[j].first) + abs(pts[i].second - pts[j].second);
 }
 
-int dist(int i, int j){//Calc dist between 2 points
-    int x1 = x[i], x2 = x[j];
-    int y1 = y[i], y2 = y[j];
-    
-    return (abs(x1-x2) + abs(y1-y2));
+void dfs(int cur, vector<char>& used, int visitedCount, ll cost) {
+    if (cost >= best) return;
+    if (visitedCount == n + 1) {
+        best = min(best, cost + manhattan(cur, n + 1));
+        return;
+    }
+    for (int v = 1; v <= n; ++v) {
+        if (!used[v]) {
+            used[v] = 1;
+            dfs(v, used, visitedCount + 1, cost + manhattan(cur, v));
+            used[v] = 0;
+        }
+    }
 }
 
-void optimalPath(int x,bool visited[],int nodes,int value){
-	if(n == nodes){//If number of nodes equal n then set value of answer
-		ans = min(ans,value + dist(x,n+1));
-	}
-	for(int i=1;i<=n;i++){
-		if(!visited[i]){
-			visited[i] = true;
-			optimalPath(i,visited,nodes+1,value + dist(x,i));//Dfs call
-			visited[i] = false;
-		}
-	}
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    for (int tc = 1; tc <= 10; ++tc) {
+        cin >> n;
+        pts.assign(n + 2, {0, 0});
+        cin >> pts[0].first >> pts[0].second;
+        cin >> pts[n + 1].first >> pts[n + 1].second;
+        for (int i = 1; i <= n; ++i) {
+            cin >> pts[i].first >> pts[i].second;
+        }
+        best = INF;
+        vector<char> used(n + 2, 0);
+        dfs(0, used, 1, 0);
+        cout << "#" << tc << " " << best << "\n";
+    }
+    return 0;
 }
 
-int main(){
-	int tCases;
-	cin >> tCases;//For testcases
-	for(int i=0;i<tCases;i++){
-		ans=INT_MAX;//Set ans to max value
-		cin >> n;
-		cin >> x[n+1] >> y[n+1] >> x[0] >> y[0];//Input destination and source x,y coordinates
-		for(int i=1;i<=n;i++){//Input drop off location coordinates
-			cin >> x[i] >> y[i];
-		}
-		bool visited[n+2]={false};
-		optimalPath(0,visited,0,0);
-		cout << "#" << i+1 << " " << ans << endl;
-	}
-	return 0;
-}
 
 /*
 #include <iostream>
